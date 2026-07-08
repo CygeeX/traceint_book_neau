@@ -2,7 +2,7 @@
     "data": {
         "userAuth": {
             "reserve": {
-                "reserveSeat": true
+                "reserueSeat": true
             }
         }
     }

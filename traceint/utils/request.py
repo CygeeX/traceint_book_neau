@@ -81,9 +81,9 @@ class Activity(Enum):
             "libId": 765
         }
     }
-    reserveSeat = {
-        "operationName": "reserveSeat",
-        "query": "mutation reserveSeat($libId: Int!, $seatKey: String!, $captchaCode: String, $captcha: String!) {\n userAuth {\n reserve {\n reserveSeat(\n libId: $libId\n seatKey: $seatKey\n captchaCode: $captchaCode\n captcha: $captcha\n )\n }\n }\n}",
+    reserueSeat = {
+        "operationName": "reserueSeat",
+        "query": "mutation reserueSeat($libId: Int!, $seatKey: String!, $captchaCode: String, $captcha: String!) {\n userAuth {\n reserve {\n reserueSeat(\n libId: $libId\n seatKey: $seatKey\n captchaCode: $captchaCode\n captcha: $captcha\n )\n }\n }\n}",
         "variables": {
             "seatKey": "27,74",
             "libId": 765,
@@ -563,41 +563,41 @@ def get_libLayout(cookie: str, lib_id: int) -> List[dict]:
     return [seat for seat in result if seat_exist(seat)]
 
 
-def reserveSeat(cookie: str, seat_key: str, lib_id: int) -> bool:
+def reserueSeat(cookie: str, seat_key: str, lib_id: int) -> bool:
     """
     预定当日座位
     Args:
         cookie: headers中的cookie
         seat_key: 座位id，seat信息中
-        lib_id: 楼层id
+        lib_id: 房间号id
 
     Returns:
         true为预定成功
     """
-    para, headers = get_para_and_headers(Activity.reserveSeat, cookie)
+    para, headers = get_para_and_headers(Activity.reserueSeat, cookie)
     para["variables"]["seatKey"] = seat_key
     para['variables']['libId'] = lib_id
     resp = post(para, headers)
     try:
         resp = resp.json()
         if 'errors' in resp:
-            log_info('reserveSeat时json数据内含错误或预定失败')
+            log_info('reserueSeat时json数据内含错误或预定失败')
             log_info(_json=resp)
             return False
-        return resp["data"]["userAuth"]["reserve"]["reserveSeat"]
+        return resp["data"]["userAuth"]["reserve"]["reserueSeat"]
     except ValueError as value_exc:
         log_info('\n' + traceback.format_exc())
-        log_info("reserveSeat时无json")
+        log_info("reserueSeat时无json")
         log_info(resp.content)
         raise value_exc
     except KeyError as key_exc:
         log_info('\n' + traceback.format_exc())
-        log_info("reserveSeat时json无对应数据")
+        log_info("reserueSeat时json无对应数据")
         log_info(_json=resp)
         raise key_exc
     except Exception as e:
         log_info('\n' + traceback.format_exc())
-        log_info("reserveSeat时发生其他异常")
+        log_info("reserueSeat时发生其他异常")
         log_info(resp)
         log_info(resp.content)
         raise e
@@ -622,7 +622,7 @@ def reserve_floor(cookie: str, floor: int, reverse: bool) -> str:
         if seat["seat_status"] == 1:
             log_info(f"开始预定{seat['name']}号")
             try:
-                if reserveSeat(cookie, seat['key'], lib_id):
+                if reserueSeat(cookie, seat['key'], lib_id):
                     log_info(f"预定成功，座位为{seat['name']}号")
                     return seat['name']
             except Exception:
